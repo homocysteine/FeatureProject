@@ -33,7 +33,7 @@ def evaluate_matching_quality(resize=[1600],input_pairs='',input_dir='',output_d
     device = 'cuda'
     print('Running inference on device \"{}\"'.format(device))
     config = {
-        'sekd':{},
+        'r2d2':{},
         'brute-force':{}
     }
 

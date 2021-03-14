@@ -187,6 +187,6 @@ if __name__ == '__main__':
         }
     ]
     # visualize(config=config[2],input='/media/yushichen/DATA/Datasets/motion.mp4')
-    visualize(config=config[4], input='/media/yushichen/DATA/Datasets/data_odometry_gray/dataset/sequences/01/image_0')
+    visualize(config=config[2], input='/media/yushichen/DATA/Datasets/data_odometry_gray/dataset/sequences/02/image_0')
     # superglue='indoor',max_keypoints=240,keypoint_threshold=0.005,nms_radius=4,
     #               sinkhorn_iterations=20,match_threshold=0.2

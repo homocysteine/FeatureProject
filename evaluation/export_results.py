@@ -17,11 +17,11 @@ config = {
 }
 
 if __name__ == '__main__':
-     extract_feature.extract_sekd(config=config,version=0) #single scale
-     extract_feature.extract_sekd(config=config,version=1) #multi scale
-     extract_feature.extract_superpoint(config=config) # superpoint
-     extract_feature.extract_opencv_features(config=config,method_name='sift')
-     extract_feature.extract_opencv_features(config=config,method_name='orb')
+     # extract_feature.extract_sekd(config=config,version=0) #single scale
+     # extract_feature.extract_sekd(config=config,version=1) #multi scale
+     # extract_feature.extract_superpoint(config=config) # superpoint
+     # extract_feature.extract_opencv_features(config=config,method_name='sift')
+     # extract_feature.extract_opencv_features(config=config,method_name='orb')
      extract_feature.extract_r2d2(config=config, version=0)
-     extract_feature.extract_r2d2(config=config, version=1)
+     # extract_feature.extract_r2d2(config=config, version=1)
 

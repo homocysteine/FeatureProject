@@ -60,7 +60,7 @@ def extract_opencv_features(config={}, method_name=''):
                     for j in range(dim_descriptor):
                         descriptors_float[i][j] = bool(descriptors[i][int(j/8)] & (1 << j%8))
                 descriptors = descriptors_float
-
+            print('keypoint: ', keypoints.shape)
 
             descriptors = descriptors.astype(np.float)
             det_dir = os.path.join(config['feature_dir'], seq_name)
@@ -173,7 +173,7 @@ def extract_r2d2(config={},version=0):
     print("Export R2D2 results:")
     outdir = config['feature_dir']
     # load the model
-    net = r2d2.load_network('/home/yushichen/PycharmProjects/pythonProject/model/r2d2_WASF_N16.pt')
+    net = r2d2.load_network('/home/yushichen/PycharmProjects/pythonProject/model/model.pt')
     net = net.cuda()
 
     for seq_name in sorted(os.listdir(config['image_dir'])):
@@ -195,14 +195,15 @@ def extract_r2d2(config={},version=0):
                 keypoints, descriptors, scores = r2d2_val(img=img, net=net, version=0)
             elif version == 1:
                 keypoints, descriptors, scores = r2d2_val(img=img, net=net, version=1)
+            print('keypoint: ',keypoints.shape)
 
             det_dir = os.path.join(config['feature_dir'], seq_name)
             if not os.path.isdir(det_dir):
                 os.makedirs(det_dir)
             if version == 0:
-                det_path = os.path.join(det_dir, img_name + '.r2d2_single')
+                det_path = os.path.join(det_dir, img_name + '.myr2d2_single')
             elif version == 1:
-                det_path = os.path.join(det_dir, img_name + '.r2d2_multi')
+                det_path = os.path.join(det_dir, img_name + '.myr2d2_multi')
             print(det_path)
             with open(det_path, 'wb') as output_file:
                 np.savez(output_file, keypoints=keypoints, scores=scores,
