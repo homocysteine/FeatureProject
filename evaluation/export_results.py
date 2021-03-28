@@ -23,5 +23,5 @@ if __name__ == '__main__':
      # extract_feature.extract_opencv_features(config=config,method_name='sift')
      # extract_feature.extract_opencv_features(config=config,method_name='orb')
      extract_feature.extract_r2d2(config=config, version=0)
-     # extract_feature.extract_r2d2(config=config, version=1)
+     extract_feature.extract_r2d2(config=config, version=1)
 

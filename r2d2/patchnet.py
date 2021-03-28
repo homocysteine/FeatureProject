@@ -92,7 +92,7 @@ class L2_Net (PatchNet):
 class Quad_L2Net (PatchNet):
     """ Same than L2_Net, but replace the final 8x8 conv by 3 successive 2x2 convs.
     """
-    def __init__(self, dim=128, mchan=4, relu22=False, **kw ):
+    def __init__(self, dim=256, mchan=4, relu22=False, **kw ):
         PatchNet.__init__(self, **kw)
         self._add_conv(  8*mchan)
         self._add_conv(  8*mchan)
@@ -130,7 +130,7 @@ class Quad_L2Net_ConfCFS (Quad_L2Net):
     """ Same than Quad_L2Net, with 2 confidence maps for repeatability and reliability.
     """
     def __init__(self, **kw ):
-        Quad_L2Net_Acc.__init__(self, **kw)
+        Quad_L2Net.__init__(self, **kw)
         # reliability classifier
         self.clf = nn.Conv2d(self.out_dim, 2, kernel_size=1)
         # repeatability classifier: for some reasons it's a softplus, not a softmax!
@@ -143,7 +143,7 @@ class Quad_L2Net_ConfCFS (Quad_L2Net):
         for op in self.ops:
             x = op(x)
         # compute the confidence maps
-        x = self.ups(x)
+        # x = self.ups(x)
         ureliability = self.clf(x**2)
         urepeatability = self.sal(x**2)
         return self.normalize(x, ureliability, urepeatability)

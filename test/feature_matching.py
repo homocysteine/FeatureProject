@@ -5,6 +5,7 @@ import torch
 from r2d2.r2d2 import R2D2_Creator
 from superpoint.superpoint import SuperPoint
 from sekd.sekd import SEKD
+from superglue.superglue import SuperGlue
 import time
 
 class Sift(torch.nn.Module):
@@ -91,6 +92,8 @@ class Matching(torch.nn.Module):
             #     self.knn = cv2.BFMatcher(cv2.NORM_HAMMING,crossCheck=True)
             # else:
             self.knn = cv2.BFMatcher()
+        if config.get('superglue') != None:
+            self.superglue = SuperGlue(config.get('superglue', {}))
 
     def forward(self,image0,image1):
         time1 = time.time()
@@ -111,62 +114,65 @@ class Matching(torch.nn.Module):
             kp1, scores1, desc1 = self.sekd(image1)
         time2 = time.time()
 
-        if self.config.get('flann') != None:
-            matches = self.flann.knnMatch(desc0,desc1,k=2)
-        if self.config.get('brute-force') != None:
-            matches = self.knn.knnMatch(desc0,desc1,k=2)
         if self.config.get('superglue') != None:
-            #need kp0 kp1 nx2->nx2
-            #need scores0, scores1 nx1->nx1
-            #need desc0, desc1 nxd->dxn
             pass
-        time3 = time.time()
-        mask = [-1 for _ in range(len(matches))]
-
-        coff = 0.8
-        matching_score = []
-        # print(len(matches))
-        # print(matches[2])
-        # print(matches)
-        # check if there is matches has only one candidate or no candidates
-        for pair in matches:
-            if len(pair) == 1:
-                pair.append(pair[0])
-            if len(pair) == 0:
-                tmp = cv2.DMatch()
-                pair.append(tmp)
-                pair.append(tmp)
-        for i,(m,n) in enumerate(matches):
-            # print(i,m,n,m.distance)
-            if m.distance < coff * n.distance:
-                mask[i] = m.trainIdx
-            if self.config.get('sift') != None:
-                matching_score.append(1 - m.distance / 500)
-            if self.config.get('orb') != None:
-                matching_score.append(1 - m.distance / 100)
-            if self.config.get('r2d2') != None:
-                matching_score.append(m.distance)
-            if self.config.get('superpoint') != None:
-                matching_score.append(m.distance)
-            if self.config.get('sekd') != None:
-                matching_score.append(m.distance)
-        mask = np.array(mask)
-        matching_score = np.array(matching_score)
-        # valid = mask > -1
-
-        # keypoint object -> nx2 numpy array
-        if (self.config.get('r2d2') != None) or \
-                (self.config.get('superpoint') != None) or \
-                (self.config.get('sekd') != None):
-            kpts0 = kp0
-            kpts1 = kp1
         else:
-            kpts0 = np.array([[k.pt[0],k.pt[1]] for k in kp0])
-            kpts1 = np.array([[k.pt[0],k.pt[1]] for k in kp1])
-        time4 = time.time()
-        print('total time:{},extracting time:{},matching time:{},ratio test:{}'.format(
-            time4-time1, time2-time1, time3-time2, time4-time3
-        ))
+            if self.config.get('flann') != None:
+                matches = self.flann.knnMatch(desc0,desc1,k=2)
+            if self.config.get('brute-force') != None:
+                matches = self.knn.knnMatch(desc0,desc1,k=2)
+            if self.config.get('superglue') != None:
+                #need kp0 kp1 nx2->nx2
+                #need scores0, scores1 nx1->nx1
+                #need desc0, desc1 nxd->dxn
+                pass
+            time3 = time.time()
+            mask = [-1 for _ in range(len(matches))]
+
+            coff = 0.8
+            matching_score = []
+            # print(len(matches))
+            # print(matches[2])
+            # print(matches)
+            # check if there is matches has only one candidate or no candidates
+            for pair in matches:
+                if len(pair) == 1:
+                    pair.append(pair[0])
+                if len(pair) == 0:
+                    tmp = cv2.DMatch()
+                    pair.append(tmp)
+                    pair.append(tmp)
+            for i,(m,n) in enumerate(matches):
+                # print(i,m,n,m.distance)
+                if m.distance < coff * n.distance:
+                    mask[i] = m.trainIdx
+                if self.config.get('sift') != None:
+                    matching_score.append(1 - m.distance / 500)
+                if self.config.get('orb') != None:
+                    matching_score.append(1 - m.distance / 100)
+                if self.config.get('r2d2') != None:
+                    matching_score.append(m.distance)
+                if self.config.get('superpoint') != None:
+                    matching_score.append(m.distance)
+                if self.config.get('sekd') != None:
+                    matching_score.append(m.distance)
+            mask = np.array(mask)
+            matching_score = np.array(matching_score)
+            # valid = mask > -1
+
+            # keypoint object -> nx2 numpy array
+            if (self.config.get('r2d2') != None) or \
+                    (self.config.get('superpoint') != None) or \
+                    (self.config.get('sekd') != None):
+                kpts0 = kp0
+                kpts1 = kp1
+            else:
+                kpts0 = np.array([[k.pt[0],k.pt[1]] for k in kp0])
+                kpts1 = np.array([[k.pt[0],k.pt[1]] for k in kp1])
+            time4 = time.time()
+            print('total time:{},extracting time:{},matching time:{},ratio test:{}'.format(
+                time4-time1, time2-time1, time3-time2, time4-time3
+            ))
         return kpts0, kpts1, mask, matching_score
 
 

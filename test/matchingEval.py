@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import cv2
 
-def evaluate_matching_quality(resize=[1600],input_pairs='',input_dir='',output_dir=''):
+def evaluate_matching_quality(resize=[800],input_pairs='',input_dir='',output_dir=''):
     if len(resize) == 2 and resize[1] == -1:
         resize = resize[0:1]
     if len(resize) == 2:
