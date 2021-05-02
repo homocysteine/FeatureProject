@@ -1,15 +1,17 @@
 from .r2d2_extraction import NonMaxSuppression,\
     extract_multiscale,load_network,extract_singlescale
 import time
+from study.uniformize import deepQuadTree
 
 class R2D2_Creator:
     def __init__(self):
         super(R2D2_Creator, self).__init__()
-        self.model = load_network('/home/yushichen/projects/r2d2/data/model_256d_14epoch.pt')
+        self.model = load_network('/home/yushichen/PycharmProjects/pythonProject/model/r2d2_WASF_N16.pt')
+        # self.model = load_network('/home/yushichen/PycharmProjects/pythonProject/model/r2d2_WASF_N16.pt')
         self.model = self.model.cuda()
 
     def detectAndCompute(self,img):
-        detector = NonMaxSuppression(rel_thr=0.7,rep_thr=0.7)
+        detector = NonMaxSuppression(rel_thr=0.45,rep_thr=0.4)
 
         start_time = time.time()
         # xys, desc, scores = extract_multiscale(self.model, img, detector,
@@ -32,26 +34,30 @@ class R2D2_Creator:
 # sacre_coeur/test/images/51093888_43012197.jpg sacre_coeur/test/images/06132465_4129851965.jpg 0 0 1767.41 0.0 319.5 0.0 1767.41 239.5 0.0 0.0 1.0 298.312 0.0 319.5 0.0 298.312 213.0 0.0 0.0 1.0 0.9966996352332725 0.07965392100983516 -0.015655350319306812 1.4390705155532202 -0.08067000820399327 0.9934087804281843 -0.08143306910926978 -2.1673154656029214 0.009065699213460364 0.0824272275158299 0.9965558515516452 -50.79668509058077 0.0 0.0 0.0 1.0
 # sacre_coeur/test/images/56774631_6820191793.jpg sacre_coeur/test/images/97437832_311711460.jpg 0 0 1196.24 0.0 319.5 0.0 1196.24 213.0 0.0 0.0 1.0 489.971 0.0 249.5 0.0 489.971 187.0 0.0 0.0 1.0 0.9961819668236043 0.002404954415486909 0.08726800771023997 -4.647139010369302 -0.009299075977530142 0.9968566148590442 0.07867920054074808 -7.320856674550398 -0.08680447086077533 -0.07919031257689638 0.993072947085235 -34.7404113343712 0.0 0.0 0.0 1.0
 # sacre_coeur/test/images/04822190_12621366523.jpg sacre_coeur/test/images/15114643_8210538601.jpg 0 0 437.366 0.0 319.5 0.0 437.366 213.0 0.0 0.0 1.0 927.73 0.0 239.5 0.0 927.73 319.5 0.0 0.0 1.0 0.749640986196629 0.31427034856093444 0.5824710635126301 -8.173907770370304 -0.2498701350511473 0.9493298517239965 -0.1906246265182338 4.654896994745255 -0.612864836178147 -0.0026420902867934012 0.7901833407097679 17.89108423041934 0.0 0.0 0.0 1.0
-        idxs = scores.argsort()[-500:]
-        xys = xys[idxs]
-        desc = desc[idxs]
-        scores = scores[idxs]
+# buckingham_palace/test/images/50616321_9586801446.jpg buckingham_palace/test/images/04738011_5330076641.jpg 0 0 541.873 0.0 319.5 0.0 541.873 213.0 0.0 0.0 1.0 699.97 0.0 319.5 0.0 699.97 213.0 0.0 0.0 1.0 0.8904509653469124 -0.1534846150400128 -0.4284151622652621 26918.834733300562 0.19318114771131412 0.9798639229166258 0.05047511005812597 4562.363375877005 0.4120414086978289 -0.12770734322058208 0.9021711101591812 12177.67684777846 0.0 0.0 0.0 1.0
+# reichstag/test/images/48542127_4157749181.jpg reichstag/test/images/48900330_6782044072.jpg 0 0 713.145 0.0 319.5 0.0 713.145 239.5 0.0 0.0 1.0 769.928 0.0 319.5 0.0 769.928 170.0 0.0 0.0 1.0 0.9915296479523266 -0.0310520027996669 -0.12611395780667792 0.8276109614398834 0.03699724289526781 0.9982982343732115 0.04507592778276209 0.4192318388027408 0.12449964357251637 -0.04935998753502381 0.9909911353694638 6.0487534307765065 0.0 0.0 0.0 1.0
 
+        # idxs = scores.argsort()[-500:]
+        # xys = xys[idxs]
+        # desc = desc[idxs]
+        # scores = scores[idxs]
+        #
+        # kp = xys[:, :2].cpu().numpy()
+        # desc = desc.cpu().numpy()
+        # scores = scores.cpu().numpy()
+
+        print((img.shape[2], img.shape[3]))
         kp = xys[:, :2].cpu().numpy()
         desc = desc.cpu().numpy()
         scores = scores.cpu().numpy()
-
-        # print(type(kp), kp.shape, kp[0])
-        # print(type(desc), desc.shape)
-        # print(type(scores), scores.shape)
-        # print(img.shape)
+        kp, desc, scores = deepQuadTree((img.shape[2], img.shape[3]), kp, desc, scores)
 # buckingham_palace/test/images/81310018_8608208863.jpg buckingham_palace/test/images/53271175_196359090.jpg 0 0 559.102 0.0 319.5 0.0 559.102 239.5 0.0 0.0 1.0 717.691 0.0 319.5 0.0 717.691 239.5 0.0 0.0 1.0 0.981293381264081 0.008206322625822467 -0.19234332885823663 34700.20375299982 0.046808252496824965 0.9589403037989246 0.27971857508613807 -8995.232140090331 0.1867412310806061 -0.28348924145192334 0.9406176495237121 -31997.44068410451 0.0 0.0 0.0 1.0
 # buckingham_palace/test/images/48284683_6191802350.jpg buckingham_palace/test/images/88817343_6780061632.jpg 0 0 447.039 0.0 319.5 0.0 447.039 213.0 0.0 0.0 1.0 716.556 0.0 319.5 0.0 716.556 213.0 0.0 0.0 1.0 0.7304499453426215 0.011235920683662642 -0.6828738034478639 48437.65914819888 0.05638235984218045 0.9954595508452798 0.07668971332284977 -1590.8005408477097 0.6806349292003666 -0.0945200334178128 0.7264998667825807 10730.713423377623 0.0 0.0 0.0 1.0
         return kp, desc, scores
 
 def r2d2_val(img, net, version=0):
     print(img.shape)
-    detector = NonMaxSuppression(rel_thr=0.45, rep_thr=0.4)
+    detector = NonMaxSuppression(rel_thr=0.7, rep_thr=0.7)
     # extract keypoints/descriptors for a single image
     if version == 1:
         xys, desc, scores = extract_multiscale(net, img, detector,

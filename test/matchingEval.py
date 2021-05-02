@@ -33,7 +33,11 @@ def evaluate_matching_quality(resize=[800],input_pairs='',input_dir='',output_di
     device = 'cuda'
     print('Running inference on device \"{}\"'.format(device))
     config = {
-        'r2d2':{},
+        'r2d2':{
+            # 'nms_radius': 4,
+            # 'keypoint_threshold': 0.005,
+            # 'max_keypoints': 500,
+        },
         'brute-force':{}
     }
 

@@ -16,16 +16,16 @@ device = torch.device('cuda:0' if use_cuda else 'cpu')
 # Add new methods here.
 methods = {
     #'d2-net':{'name':'D2-Net','color':'purple', 'linestyle':':', 'marker':'+'},
-    'orb':   {'name':'ORB',   'color':'black',  'linestyle':'-','marker':'d'},
+    #'orb':   {'name':'ORB',   'color':'black',  'linestyle':'-','marker':'d'},
     #'delf':  {'name':'DELF',  'color':'pink',   'linestyle':'--','marker':'x'},
-    '256r2d2_single': {'name':'256R2D2_S', 'color':'purple','linestyle':'-', 'marker':'^'},
-    '256r2d2_multi': {'name':'256R2D2_M', 'color':'purple',   'linestyle':'-', 'marker':'o'},
+    # '256r2d2_single': {'name':'256R2D2_S', 'color':'purple','linestyle':'-', 'marker':'^'},
+    # '256r2d2_multi': {'name':'256R2D2_M', 'color':'purple',   'linestyle':'-', 'marker':'o'},
     'myr2d2_single':  {'name':'myR2D2_S',  'color':'red',    'linestyle':'-','marker':'^'},
     'myr2d2_multi':  {'name':'myR2D2_M',  'color':'red',    'linestyle':'-','marker':'o'},
-    'sift':  {'name':'SIFT',  'color':'orange', 'linestyle':'-', 'marker':'^'},
-    'superpoint':{'name':'SuperPoint','color':'pink','linestyle':'-','marker':'v'},
-    'sekd_single':  {'name':'SEKD_S',  'color':'green',  'linestyle':'-', 'marker':'^'},
-    'sekd_multi': {'name':'SEKD_M','color':'green',  'linestyle':'-', 'marker':'o'},
+    # 'sift':  {'name':'SIFT',  'color':'orange', 'linestyle':'-', 'marker':'^'},
+    # 'superpoint':{'name':'SuperPoint','color':'pink','linestyle':'-','marker':'v'},
+    # 'sekd_single':  {'name':'SEKD_S',  'color':'green',  'linestyle':'-', 'marker':'^'},
+    # 'sekd_multi': {'name':'SEKD_M','color':'green',  'linestyle':'-', 'marker':'o'},
     'r2d2_single':{'name':'R2D2_S','color':'blue','linestyle':'-','marker':'^'},
     'r2d2_multi':  {'name':'R2D2_M',  'color':'blue',  'linestyle':'-','marker':'o'},
     }

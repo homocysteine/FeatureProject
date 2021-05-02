@@ -173,7 +173,7 @@ def extract_r2d2(config={},version=0):
     print("Export R2D2 results:")
     outdir = config['feature_dir']
     # load the model
-    net = r2d2.load_network('/home/yushichen/projects/r2d2/data/model_256d_9epoch2.pt')
+    net = r2d2.load_network('/home/yushichen/projects/r2d2/data/model_5e-5_9epoch.pt')
     net = net.cuda()
 
     for seq_name in sorted(os.listdir(config['image_dir'])):
@@ -201,9 +201,9 @@ def extract_r2d2(config={},version=0):
             if not os.path.isdir(det_dir):
                 os.makedirs(det_dir)
             if version == 0:
-                det_path = os.path.join(det_dir, img_name + '.256r2d2_single')
+                det_path = os.path.join(det_dir, img_name + '.myr2d2_single')
             elif version == 1:
-                det_path = os.path.join(det_dir, img_name + '.256r2d2_multi')
+                det_path = os.path.join(det_dir, img_name + '.myr2d2_multi')
             print(det_path)
             with open(det_path, 'wb') as output_file:
                 np.savez(output_file, keypoints=keypoints, scores=scores,

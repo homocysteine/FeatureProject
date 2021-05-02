@@ -11,6 +11,25 @@ def model_size(model):
         size += np.prod(weights.shape)
     return size
 
+def torch_set_gpu(gpus):
+    if type(gpus) is int:
+        gpus = [gpus]
+
+    cuda = all(gpu>=0 for gpu in gpus)
+
+    if cuda:
+        os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(gpu) for gpu in gpus])
+        assert cuda and torch.cuda.is_available(), "%s has GPUs %s unavailable" % (
+            os.environ['HOSTNAME'],os.environ['CUDA_VISIBLE_DEVICES'])
+        torch.backends.cudnn.benchmark = True # speed-up cudnn
+        torch.backends.cudnn.fastest = True # even more speed-up?
+        print( 'Launching on GPUs ' + os.environ['CUDA_VISIBLE_DEVICES'] )
+
+    else:
+        print( 'Launching on CPU' )
+
+    return cuda
+
 def load_network(model_fn): 
     checkpoint = torch.load(model_fn)
     print("\n>> Creating net = " + checkpoint['net']) 

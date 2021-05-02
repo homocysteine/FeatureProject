@@ -6,6 +6,7 @@ from r2d2.r2d2 import R2D2_Creator
 from superpoint.superpoint import SuperPoint
 from sekd.sekd import SEKD
 from superglue.superglue import SuperGlue
+from study.UniformOrb import quadTreeTest
 import time
 
 class Sift(torch.nn.Module):
@@ -14,7 +15,9 @@ class Sift(torch.nn.Module):
         self.sift = cv2.xfeatures2d.SIFT_create(nfeatures=500)
 
     def forward(self,image):
-        kp,desc = self.sift.detectAndCompute(image, None)
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        # kp,desc = self.sift.detectAndCompute(image, None)
+        kp, desc = quadTreeTest(self.sift, nfeatures=500, image=image)
         scores = np.array([k.response for k in kp])
         return kp,scores,desc
 
@@ -24,7 +27,9 @@ class Orb(torch.nn.Module):
         self.orb = cv2.ORB_create(nfeatures=500)
 
     def forward(self,image):
-        kp, desc = self.orb.detectAndCompute(image,None)
+        image = cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
+        # kp, desc = self.orb.detectAndCompute(image,None)
+        kp,desc = quadTreeTest(self.orb,nfeatures=500,image=image)
         scores = np.array([k.response for k in kp])
         return kp, scores, desc
 
@@ -41,7 +46,7 @@ class R2D2(torch.nn.Module):
 class Sekd(torch.nn.Module):
     def __init__(self):
         super(Sekd, self).__init__()
-        self.sekd = SEKD(multi_scale=True,cuda=True)
+        self.sekd = SEKD(multi_scale=False,cuda=True)
 
     def forward(self,image):
         kp, scores, desc = self.sekd.detectAndCompute(image)
@@ -53,7 +58,8 @@ class SuperpointNet(torch.nn.Module):
         self.superpoint = SuperPoint(config.get('superpoint'))
 
     def forward(self,image):
-        pred = self.superpoint({'image':image})
+        with torch.no_grad():
+            pred = self.superpoint({'image':image})
         kp = pred['keypoints'][0].cpu().detach().numpy() # nx2 numpy
         desc = pred['descriptors'][0].cpu().detach().numpy().T
         scores = pred['scores'][0].cpu().detach().numpy()
@@ -88,10 +94,10 @@ class Matching(torch.nn.Module):
             search_params = dict(checks=50)
             self.flann = cv2.FlannBasedMatcher(index_params, search_params)
         if config.get('brute-force') != None:
-            # if config.get('orb') != None:
-            #     self.knn = cv2.BFMatcher(cv2.NORM_HAMMING,crossCheck=True)
-            # else:
-            self.knn = cv2.BFMatcher()
+            if config.get('orb') != None:
+                self.knn = cv2.BFMatcher(cv2.NORM_HAMMING,crossCheck=False)
+            else:
+                self.knn = cv2.BFMatcher()
         if config.get('superglue') != None:
             self.superglue = SuperGlue(config.get('superglue', {}))
 
@@ -120,14 +126,20 @@ class Matching(torch.nn.Module):
             if self.config.get('flann') != None:
                 matches = self.flann.knnMatch(desc0,desc1,k=2)
             if self.config.get('brute-force') != None:
-                matches = self.knn.knnMatch(desc0,desc1,k=2)
+                if self.config.get('orb') != None:
+                    matches = self.knn.knnMatch(desc0,desc1,k=2)
+                else:
+                    matches = self.knn.knnMatch(desc0,desc1,k=2)
             if self.config.get('superglue') != None:
                 #need kp0 kp1 nx2->nx2
                 #need scores0, scores1 nx1->nx1
                 #need desc0, desc1 nxd->dxn
                 pass
             time3 = time.time()
+            # if len(matches)>=500:
             mask = [-1 for _ in range(len(matches))]
+            # else:
+            #     mask = [-1 for _ in range(500)]
 
             coff = 0.8
             matching_score = []
@@ -135,6 +147,19 @@ class Matching(torch.nn.Module):
             # print(matches[2])
             # print(matches)
             # check if there is matches has only one candidate or no candidates
+            # if self.config.get('orb') != None:
+            #     mask = matches.trainIdx
+            #     print(matches)
+            #     matching_score.append(1 - matches.distance / 100)
+            # else:
+            # if self.config.get('orb') != None:
+            #     # if len(matches)<500:
+            #     #     for _ in range(500-len(matches)):
+            #     #         matches.append(cv2.DMatch())
+            #     for i,m in enumerate(matches):
+            #         mask[i] = m.trainIdx
+            #         matching_score.append(1 - m.distance / 100)
+            # else:
             for pair in matches:
                 if len(pair) == 1:
                     pair.append(pair[0])

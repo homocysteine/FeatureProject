@@ -31,7 +31,7 @@ def visualize(config,input=0,resize=[640,480],show_keypoints=False,no_display=Fa
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # torch.backends.cudnn.benchmark = True
-    torch_set_gpu(0)
+    # torch_set_gpu(0)
     matching = Matching(config=config).eval().to(device)
 
     # Create a window to display the demo.
@@ -95,7 +95,8 @@ def visualize(config,input=0,resize=[640,480],show_keypoints=False,no_display=Fa
 
         # print(mkpts0)
         timePerImage = end_time - start_time
-        name ='sift_flann'
+        extractor, matcher = config.keys()
+        name = extractor + ' ' + matcher
         text = [
             name,
             'Keypoints: {}:{}'.format(len(kpts0), len(kpts1)),
@@ -163,11 +164,11 @@ if __name__ == '__main__':
     config = [
         {
             'sift': {},
-            'flann': {}
+            'brute-force': {}
         },
         {
             'orb': {},
-            'flann': {}
+            'brute-force': {}
         },
         {
             'r2d2':{},

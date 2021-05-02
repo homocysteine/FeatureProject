@@ -92,7 +92,7 @@ class L2_Net (PatchNet):
 class Quad_L2Net (PatchNet):
     """ Same than L2_Net, but replace the final 8x8 conv by 3 successive 2x2 convs.
     """
-    def __init__(self, dim=256, mchan=4, relu22=False, **kw ):
+    def __init__(self, dim=128, mchan=4, relu22=False, **kw ):
         PatchNet.__init__(self, **kw)
         self._add_conv(  8*mchan)
         self._add_conv(  8*mchan)
